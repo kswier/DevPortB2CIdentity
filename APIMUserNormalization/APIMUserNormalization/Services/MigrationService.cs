@@ -275,64 +275,66 @@ namespace APIMUserNormalization.Services
 
             foreach (var userCollection in apimUserCollections)
             {
-
-                foreach (var user in userCollection.value)
+                if (userCollection != null)
                 {
-
-                    bool hasADB2C = false;
-                    bool isFoundInADB2C = false;
-                    bool isEmailFoundInADB2C = false;
-                    string objectId = string.Empty;
-                    string email = user.Properties.Email;
-
-                    var uns = new UserNormalizationStatus();
-
-                    foreach (var identity in user.Properties.Identities)
+                    foreach (var user in userCollection.value)
                     {
-                        if (identity.Provider.Equals("AadB2C"))
-                        {
-                            hasADB2C = true;
 
-                            var b2cUser = await GetAADB2CUserById(identity.Id);
-                            if (b2cUser == null)
+                        bool hasADB2C = false;
+                        bool isFoundInADB2C = false;
+                        bool isEmailFoundInADB2C = false;
+                        string objectId = string.Empty;
+                        string email = user.Properties.Email;
+
+                        var uns = new UserNormalizationStatus();
+
+                        foreach (var identity in user.Properties.Identities)
+                        {
+                            if (identity.Provider.Equals("AadB2C"))
                             {
-                                isFoundInADB2C = false;
+                                hasADB2C = true;
+
+                                var b2cUser = await GetAADB2CUserById(identity.Id);
+                                if (b2cUser == null)
+                                {
+                                    isFoundInADB2C = false;
+                                }
+                                else if (DoesB2CUserHasThisEmail(b2cUser, user.Properties.Email))
+                                {
+                                    isFoundInADB2C = true;
+                                    isEmailFoundInADB2C = true;
+                                    objectId = identity.Id;
+                                }
+                                else
+                                {
+                                    isFoundInADB2C = true;
+                                    isEmailFoundInADB2C = false;
+                                }
+                                break;
                             }
-                            else if (DoesB2CUserHasThisEmail(b2cUser, user.Properties.Email))
-                            {
-                                isFoundInADB2C = true;
-                                isEmailFoundInADB2C = true;
-                                objectId = identity.Id;
-                            }
-                            else
-                            {
-                                isFoundInADB2C = true;
-                                isEmailFoundInADB2C = false;
-                            }
-                            break;
+
                         }
 
-                    }
+                        uns.APIMName = "";
+                        uns.HasADB2C = hasADB2C;
+                        uns.IsEmailFoundInADB2C = isEmailFoundInADB2C;
+                        uns.IsFoundInADB2C = isFoundInADB2C;
+                        uns.ObjectId = objectId;
+                        uns.ExistsInAPIM = true;
+                        if (iterIdx < apims.Length) uns.APIMName = apims[iterIdx].APIMServiceName;
 
-                    uns.APIMName = "";
-                    uns.HasADB2C = hasADB2C;
-                    uns.IsEmailFoundInADB2C = isEmailFoundInADB2C;
-                    uns.IsFoundInADB2C = isFoundInADB2C;
-                    uns.ObjectId = objectId;
-                    uns.ExistsInAPIM = true;
-                    if (iterIdx < apims.Length) uns.APIMName = apims[iterIdx].APIMServiceName;
-
-                    UserNormalization un = FindUserNormalizationByEmail(userNormalizationList, email);
-                    if (un != null)
-                    {
-                        un.AddUserNormalizationStatus(uns);
-                    }
-                    else
-                    {
-                        un = new UserNormalization();
-                        un.Email = email;
-                        un.AddUserNormalizationStatus(uns);
-                        userNormalizationList.Add(un);
+                        UserNormalization un = FindUserNormalizationByEmail(userNormalizationList, email);
+                        if (un != null)
+                        {
+                            un.AddUserNormalizationStatus(uns);
+                        }
+                        else
+                        {
+                            un = new UserNormalization();
+                            un.Email = email;
+                            un.AddUserNormalizationStatus(uns);
+                            userNormalizationList.Add(un);
+                        }
                     }
                 }
                 iterIdx++;
@@ -765,6 +767,23 @@ namespace APIMUserNormalization.Services
             GraphServiceClient graphClient = new GraphServiceClient(authProvider);
 
             return UserService.GetUserById(graphClient, id);
+        }
+
+
+        public async Task BackupAPIM()
+        {
+            APIMService apimClient = apims[0];
+            apimClient.BackupApimAsync();
+            Console.WriteLine("APIM Backed Up");
+            Console.WriteLine("");
+        }
+
+        public async Task RestoreAPIM(string backupName)
+        {
+            APIMService apimClient = apims[0];
+            apimClient.RestoreApimAsync(backupName);
+            Console.WriteLine("APIM Restored");
+            Console.WriteLine("");
         }
 
     }

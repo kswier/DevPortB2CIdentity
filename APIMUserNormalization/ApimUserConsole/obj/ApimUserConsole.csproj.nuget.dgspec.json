@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj": {}
+    "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj": {}
   },
   "projects": {
-    "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj": {
+    "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj",
+        "projectUniqueName": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj",
         "projectName": "ApimUserConsole",
-        "projectPath": "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj",
-        "packagesPath": "C:\\Users\\seadan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\obj\\",
+        "projectPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj",
+        "packagesPath": "C:\\Users\\kaswiere\\.nuget\\packages\\",
+        "outputPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\seadan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\kaswiere\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -30,8 +30,8 @@
         "frameworks": {
           "netcoreapp3.1": {
             "projectReferences": {
-              "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj": {
-                "projectPath": "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj"
+              "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj": {
+                "projectPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj"
               }
             }
           }
@@ -62,35 +62,29 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[3.1.2, 3.1.2]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.300\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj": {
+    "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj",
+        "projectUniqueName": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj",
         "projectName": "APIMUserNormalization",
-        "projectPath": "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj",
-        "packagesPath": "C:\\Users\\seadan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\seadan\\source\\repos\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\obj\\",
+        "projectPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj",
+        "packagesPath": "C:\\Users\\kaswiere\\.nuget\\packages\\",
+        "outputPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\seadan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\kaswiere\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -147,18 +141,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[3.1.2, 3.1.2]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.300\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
         }
       }
     }

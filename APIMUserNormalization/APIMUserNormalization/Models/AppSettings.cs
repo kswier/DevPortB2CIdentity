@@ -13,7 +13,8 @@ namespace APIMUserNormalization.Models
         public static AppSettings ReadFromJsonFile()
         {
             var builder = new ConfigurationBuilder();
-            builder.AddAzureAppConfiguration("Endpoint=https://usernormalizationconfiguration.azconfig.io;Id=Do9P-l6-s0:FCswtGBYgfMD7TNh+fMi;Secret=Veq5LbBxfMatEwsrpdAmvQScN6Rp0YTKMe3MbqXQhXY=");
+            //builder.AddAzureAppConfiguration("Endpoint=https://apimb2cconf.azconfig.io;Id=yk8O-l6-s0:2fwdKxcKM8kBaR0Wh85v;Secret=ELiblmcJWMpyPCSb52AWeJC5veAePsBKKrHerNRKQO0=");
+            builder.AddAzureAppConfiguration("Endpoint = https://apimconfig.azconfig.io;Id=sbwT-l5-s0:jh1gVSnIW4hSLH2eLWnr;Secret=A/IM3Ohp0P9s1dO6riHjdqz7vwy19qL7aZqapd2Gq8Q=");
             Configuration = builder.Build();
             return Configuration.Get<AppSettings>();
         }
@@ -57,5 +58,24 @@ namespace APIMUserNormalization.Models
 
         [JsonProperty(PropertyName = "APIMTenantId")]
         public string APIMTenantId { get; set; }
+
+        [JsonProperty(PropertyName = "BackupStorageAccount")]
+        public string BackupStorageAccount { get; set; }
+
+        [JsonProperty(PropertyName = "BackupAccessKey")]
+        public string BackupAccessKey { get; set; }
+
+        [JsonProperty(PropertyName = "BackupContainer")]
+        public string BackupContainer { get; set; }
+
+        [JsonProperty(PropertyName = "RestoreSubscriptionId")]
+        public string RestoreSubscriptionId { get; set; }
+
+        [JsonProperty(PropertyName = "RestoreResourceGroup")]
+        public string RestoreResourceGroup { get; set; }
+
+        [JsonProperty(PropertyName = "RestoreServiceName")]
+        public string RestoreServiceName { get; set; }
+
     }
 }

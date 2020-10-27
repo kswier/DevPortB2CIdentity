@@ -46,6 +46,7 @@ namespace APIMUserNormalization.ConsoleView
                 Console.WriteLine("[C]      Normalize all Users");
             }
             Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("[D]      Backup/Restore APIM");
             Console.WriteLine("[E]      Print Config Attributes");
             Console.WriteLine("[X]      Exit Program Console");
             Console.WriteLine("-------------------------");
@@ -67,6 +68,10 @@ namespace APIMUserNormalization.ConsoleView
                     break;
                 case "C":
                     await migrationService.NormalizeAllUsersAsync();
+                    Console.WriteLine("Done...");
+                    break;
+                case "D":
+                    await BackupRestoreAPIM();
                     Console.WriteLine("Done...");
                     break;
                 case "E":
@@ -135,6 +140,36 @@ namespace APIMUserNormalization.ConsoleView
                 await migrationService.NormalizeUserAsync(un);
             }
 
+        }
+        
+        private async Task BackupRestoreAPIM()
+        {
+            Console.WriteLine("[1]      Backup APIM");
+            Console.WriteLine("[2]      Restore APIM");
+            Console.WriteLine("[3]      Go Back");
+            string option = Console.ReadLine();
+            option = option.ToUpper();
+
+            switch (option)
+            {
+                case "1":
+                    await migrationService.BackupAPIM();
+                    userSetup = true;
+                    Console.WriteLine("Done...");
+                    break;
+                case "2":
+                    Console.WriteLine("What is the backup name:");
+                    string backupName = Console.ReadLine();
+                    await migrationService.RestoreAPIM(backupName);
+                    Console.WriteLine("Done...");
+                    break;
+                case "3":
+                    PrintMainMenu();
+                    break;
+                default:
+                    PrintMainMenu();
+                    break;
+            }
         }
 
 

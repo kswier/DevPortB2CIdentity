@@ -156,7 +156,7 @@ namespace APIMUserNormalization.Services
          * string urlParameters = "?api-version=2019-01-01";
          * 
         */
-        private async Task<string> ExecutePatchRequest(string ifMatch, string url, string subscriptionId, string resourceGroup, string apiManagementName, string request, string urlParameters, StringContent bodyContent)
+        private async Task<string> ExecutePatchRequest(string ifMatch, string url, string subscriptionId, string resourceGroup, string apiManagementName, string request, string urlParameters, StringContent bodyContent, bool doPost = false)
         {
 
             if (bearerToken == null)
@@ -188,7 +188,10 @@ namespace APIMUserNormalization.Services
             }
             else
             {
-                response = await client.PutAsync(apiUrl, bodyContent);
+                if (doPost)
+                    response = await client.PostAsync(apiUrl, bodyContent);
+                else
+                    response = await client.PutAsync(apiUrl, bodyContent);
             }
 
 
@@ -365,6 +368,40 @@ namespace APIMUserNormalization.Services
             return groupUserResponse;
 
         }
+
+        public async Task<string> BackupApimAsync()
+        {
+            DateTime aDate = DateTime.Now;
+            string backupName = aDate.ToString("MMddyyhhmm") + "backup.bak";
+            var json = "{";
+            json += "\"StorageAccount\": \"" + config.BackupStorageAccount + "\",";
+            json += "\"accessKey\": \"" + config.BackupAccessKey + "\",";
+            json += "\"containerName\": \"" + config.BackupContainer + "\",";
+            json += "\"backupName\": \"" + backupName + "\",";
+            json += "}";
+
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            string response = await ExecutePatchRequest("", "https://management.azure.com/subscriptions/", APIMSubscriptionId, APIMResourceGroup, APIMServiceName, "/backup", "?api-version=2018-06-01-preview", data, true);
+            //string response = await ExecutePatchRequest("", "https://management.azure.com/subscriptions/", APIMSubscriptionId, APIMResourceGroup, config.RestoreServiceName, "/backup", "?api-version=2018-06-01-preview", data, true);
+            return response;
+        }
+
+        public async Task<string> RestoreApimAsync(string backupName)
+        {
+            var json = "{";
+            json += "\"StorageAccount\": \"" + config.BackupStorageAccount + "\",";
+            json += "\"accessKey\": \"" + config.BackupAccessKey + "\",";
+            json += "\"containerName\": \"" + config.BackupContainer + "\",";
+            json += "\"backupName\": \"" + backupName + "\",";
+            json += "}";
+
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            string response = await ExecutePatchRequest("", "https://management.azure.com/subscriptions/", APIMSubscriptionId, APIMResourceGroup, config.RestoreServiceName, "/restore", "?api-version=2018-06-01-preview", data, true);
+            return response;
+        }
+
     }
 
 }
