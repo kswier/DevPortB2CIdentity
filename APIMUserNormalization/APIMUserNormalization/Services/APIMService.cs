@@ -214,6 +214,7 @@ namespace APIMUserNormalization.Services
             else
             {
                 Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
+                Console.WriteLine("{0}", apiUrl);
             }
 
             return responseValue;
