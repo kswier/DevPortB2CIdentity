@@ -398,8 +398,9 @@ namespace APIMUserNormalization.Services
             json += "}";
 
             var data = new StringContent(json, Encoding.UTF8, "application/json");
+            
 
-            string response = await ExecutePatchRequest("", "https://management.azure.com/subscriptions/", APIMSubscriptionId, APIMResourceGroup, config.RestoreServiceName, "/restore", "?api-version=2018-06-01-preview", data, true);
+            string response = await ExecutePatchRequest("", "https://management.azure.com/subscriptions/", APIMSubscriptionId, config.RestoreResourceGroup, config.RestoreServiceName, "/restore", "?api-version=2018-06-01-preview", data, true);
             return response;
         }
 

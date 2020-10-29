@@ -13,7 +13,6 @@ namespace APIMUserNormalization.ConsoleView
     {
 
         MigrationService migrationService;
-        static AppSettings config;
         bool userSetup = false;
 
         public UserConsole()
@@ -176,14 +175,7 @@ namespace APIMUserNormalization.ConsoleView
 
         public void PrintConfig()
         {
-            Console.WriteLine();
-            Console.WriteLine("API Mgmt Tenant Id   : " + config.APIMTenantId);
-
-            Console.WriteLine("API Instances        : " + config.APIMApiManagementNames.Split(";").Length);
-            Console.WriteLine("Resource Groups      : " + config.APIMResourceGroups.Split(";").Length);
-            Console.WriteLine("API Mgmt Client Id   : " + config.APIMClientID);
-            Console.WriteLine("Azure AD B2C Tenant  : " + config.AADB2CTenantId);
-            Console.WriteLine("Azure AD Client Id   : " + config.AADB2CAppId);
+            migrationService.PrintConfig();
         }
 
     }

@@ -266,6 +266,12 @@ namespace APIMUserNormalization.Services
             Console.WriteLine("API Mgmt Client Id   : " + config.APIMClientID);
             Console.WriteLine("Azure AD B2C Tenant  : " + config.AADB2CTenantId);
             Console.WriteLine("Azure AD Client Id   : " + config.AADB2CAppId);
+
+            Console.WriteLine("Backup Storage Account : " + config.BackupStorageAccount);
+            Console.WriteLine("Backup Container       : " + config.BackupContainer);
+            Console.WriteLine("Restore Resource Group : " + config.RestoreResourceGroup);
+            Console.WriteLine("Restore Service Name   : " + config.RestoreServiceName);
+
         }
 
         public async Task SetupUserCollections()
