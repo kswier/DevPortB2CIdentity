@@ -13,15 +13,16 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Reflection;
 using Microsoft.Graph;
+using log4net;
 
 namespace APIMUserNormalization.Services
 {
     public class APIMService
     {
-
+        ILog log;
         // Read application settings from appsettings.json (tenant ID, app ID, client secret, etc.)
         AppSettings config = AppSettingsFile.ReadFromJsonFile();
-       
+
         private string bearerToken = string.Empty;
 
 
@@ -31,6 +32,7 @@ namespace APIMUserNormalization.Services
             APIMResourceGroup = pAPIMResourceGroup;
             APIMTenantId = pAPIMTenantId;
             APIMSubscriptionId = pAPIMSubscriptionId;
+
         }
 
 
@@ -87,7 +89,25 @@ namespace APIMUserNormalization.Services
 
         public async Task<UserCollection> GetUsersFromAPIM()
         {
+            //ALB: The NextLink metaphor is to get all users by page. Using this technique since the quantity known for this project is less than 300.
+            string oldNextLink = "";
             UserCollection users = await GetApiManagementUsersAsync(APIMSubscriptionId, APIMResourceGroup, APIMServiceName);
+            while (users.nextLink != null)
+            {
+                if (oldNextLink == users.nextLink)
+                {
+                    break;
+                }
+                // since the request is limited to 100 users, this will get the next list of users and add them.
+                UserCollection nextUsers = await GetApiManagementUsersAsync(APIMSubscriptionId, APIMResourceGroup, APIMServiceName, users.nextLink);
+                foreach (var user in nextUsers.value)
+                {
+                    users.AddUserContract(user);
+                }
+
+                oldNextLink = users.nextLink;
+            }
+
             return users;
 
         }
@@ -226,10 +246,16 @@ namespace APIMUserNormalization.Services
         }
 
 
-        private async Task<UserCollection> GetApiManagementUsersAsync(string subscriptionId, string resourceGroup, string apiManagementName)
+        private async Task<UserCollection> GetApiManagementUsersAsync(string subscriptionId, string resourceGroup, string apiManagementName, string nextLink = "")
         {
+            var responseValue = "";
+            var urlEnd = "";
+            if (nextLink != "")
+            {
+                urlEnd = nextLink.Substring(nextLink.IndexOf("2019-01-01") + 10);
+            }
 
-            var responseValue = await ExecuteGetRequest("https://management.azure.com/subscriptions/", subscriptionId, resourceGroup, apiManagementName, "/users", "?api-version=2019-01-01");
+            responseValue = await ExecuteGetRequest("https://management.azure.com/subscriptions/", subscriptionId, resourceGroup, apiManagementName, "/users", "?api-version=2019-01-01" + urlEnd);
             if (responseValue != null && !responseValue.Equals(string.Empty))
             {
                 UserCollection users = System.Text.Json.JsonSerializer.Deserialize<UserCollection>(responseValue);
@@ -237,6 +263,7 @@ namespace APIMUserNormalization.Services
                 {
                     GroupContractCollection groups = await GerUserGroups(subscriptionId, resourceGroup, apiManagementName, user.Id);
                     user.Properties.Groups = groups;
+                    user.sourceAPIM = apiManagementName;
                 }
                 return users;
             }
@@ -398,7 +425,7 @@ namespace APIMUserNormalization.Services
             json += "}";
 
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-            
+
 
             string response = await ExecutePatchRequest("", "https://management.azure.com/subscriptions/", APIMSubscriptionId, config.RestoreResourceGroup, config.RestoreServiceName, "/restore", "?api-version=2018-06-01-preview", data, true);
             return response;

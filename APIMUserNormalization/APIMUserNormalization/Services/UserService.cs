@@ -8,11 +8,17 @@ using System.Threading.Tasks;
 using APIMUserNormalization.Models;
 using Microsoft.Graph;
 using Newtonsoft.Json;
+using log4net;
 
 namespace APIMUserNormalization.Services
 {
     class UserService
     {
+        ILog log;
+        public UserService(ILog injectedLogger)
+        {
+            log = injectedLogger;
+        }
         public static async Task ListUsers(GraphServiceClient graphClient)
         {
             Console.WriteLine("Getting list of users...");
@@ -98,7 +104,7 @@ namespace APIMUserNormalization.Services
             }
         }
 
-        public static async Task<User> GetUserById(GraphServiceClient graphClient, string userId)
+        public static async Task<User> GetUserById(GraphServiceClient graphClient, string userId, string userName = "Null")
         {
 
             try
@@ -127,7 +133,7 @@ namespace APIMUserNormalization.Services
 
                 if (ex.Message.Contains("NotFound") || ex.Message.Contains("Not Found"))
                 {
-                    Console.WriteLine("User (" + userId + ") Not Found in Azure AD B2C");
+                    Console.WriteLine("User Name: (" + userName + ") User Id: (" + userId + ") Not Found in Azure AD B2C");
                 }
                 else
                 {
@@ -312,8 +318,9 @@ namespace APIMUserNormalization.Services
         }
 
 
-        public static async Task<User> CreateUserFromAPIMToAADB2C(GraphServiceClient graphClient, string b2cExtensionAppClientId, string tenantId, UserContract user)
+        public static async Task<User> CreateUserFromAPIMToAADB2C(GraphServiceClient graphClient, string b2cExtensionAppClientId, string tenantId, UserContract user, bool migrationEnabled, string tableConnection)
         {
+            string defaultPassword = "DevCenter2020!";
             if (string.IsNullOrWhiteSpace(b2cExtensionAppClientId))
             {
                 throw new ArgumentException("B2C Extension App ClientId (ApplicationId) is missing in the appsettings.json. Get it from the App Registrations blade in the Azure portal. The app registration has the name 'b2c-extensions-app. Do not modify. Used by AADB2C for storing user data.'.", nameof(b2cExtensionAppClientId));
@@ -333,43 +340,47 @@ namespace APIMUserNormalization.Services
             //IDictionary<string, object> extensionInstance = new Dictionary<string, object>();
             //extensionInstance.Add(companyAttributeName, "ValueToBeAdded");
 
+            Microsoft.Graph.User result = null;
 
             try
             {
-                // Create user
-                var result = await graphClient.Users
-                .Request()
-                .AddAsync(new User
+                if (migrationEnabled)
                 {
-                    GivenName = user.Properties.FirstName,
-                    Surname = user.Properties.LastName,
-                    DisplayName = user.Properties.FirstName + " " + user.Properties.LastName,
-                    Identities = new List<ObjectIdentity>
-                    {
-                        new ObjectIdentity()
-                        {
-                            SignInType = "emailAddress",
-                            Issuer = tenantId,
-                            IssuerAssignedId = user.Properties.Email
-                        }
-                    },
-                    PasswordProfile = new PasswordProfile()
-                    {
-                        //Password = Helpers.PasswordHelper.GenerateNewPassword(4, 8, 4)
-                        Password = "DevCenter2020!"
-                    },
-                    PasswordPolicies = "DisablePasswordExpiration" //,
-                    //AdditionalData = extensionInstance
-                });
-
-                string userId = result.Id;
-
-                // Get created user by object ID
-                result = await graphClient.Users[userId]
+                    // Create user
+                    result = await graphClient.Users
                     .Request()
-                    //.Select($"id,givenName,surName,displayName,identities,{companyAttributeName}")
-                    .Select($"id,givenName,surName,displayName,identities")
-                    .GetAsync();
+                    .AddAsync(new User
+                    {
+                        GivenName = user.Properties.FirstName,
+                        Surname = user.Properties.LastName,
+                        DisplayName = user.Properties.FirstName + " " + user.Properties.LastName,
+                        Identities = new List<ObjectIdentity>
+                        {
+                            new ObjectIdentity()
+                            {
+                                SignInType = "emailAddress",
+                                Issuer = tenantId,
+                                IssuerAssignedId = user.Properties.Email
+                            }
+                        },
+                        PasswordProfile = new PasswordProfile()
+                        {
+                            //Password = Helpers.PasswordHelper.GenerateNewPassword(4, 8, 4)
+                            Password = defaultPassword
+                        },
+                        PasswordPolicies = "DisablePasswordExpiration" //,
+                        //AdditionalData = extensionInstance
+                    });
+
+                    string userId = result.Id;
+
+                    // Get created user by object ID
+                    result = await graphClient.Users[userId]
+                        .Request()
+                        //.Select($"id,givenName,surName,displayName,identities,{companyAttributeName}")
+                        .Select($"id,givenName,surName,displayName,identities")
+                        .GetAsync();
+                }
 
                 if (result != null)
                 {
@@ -379,8 +390,20 @@ namespace APIMUserNormalization.Services
                     Console.ResetColor();
                     Console.ForegroundColor = ConsoleColor.White;
                     //Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
-                    return result;
                 }
+
+                //ALB:  If we skipped the results because this is a test then add to log
+                //      If we got the results then add to log
+                if (result != null || !migrationEnabled)
+                {
+                    string jsonProps = JsonConvert.SerializeObject(user.Properties, Formatting.Indented);
+
+                    var ats = new AzureTableService(tableConnection, "accountsLog");
+                    ats.WriteSuccessEnablement(user.sourceAPIM, user.Properties.Email, jsonProps, defaultPassword, migrationEnabled);
+                    //ALB:Done
+                }
+
+                return result;
             }
             catch (ServiceException ex)
             {

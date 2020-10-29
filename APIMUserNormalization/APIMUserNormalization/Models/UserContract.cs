@@ -19,6 +19,7 @@ namespace APIMUserNormalization.Models
         [JsonPropertyName("properties")]
         public Properties Properties { get; set; }
 
+        public string sourceAPIM { get; set; }
 
     }
 }

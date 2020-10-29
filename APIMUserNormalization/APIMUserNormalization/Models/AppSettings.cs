@@ -13,8 +13,15 @@ namespace APIMUserNormalization.Models
         public static AppSettings ReadFromJsonFile()
         {
             var builder = new ConfigurationBuilder();
-            //builder.AddAzureAppConfiguration("Endpoint=https://apimb2cconf.azconfig.io;Id=yk8O-l6-s0:2fwdKxcKM8kBaR0Wh85v;Secret=ELiblmcJWMpyPCSb52AWeJC5veAePsBKKrHerNRKQO0=");
-            builder.AddAzureAppConfiguration("Endpoint = https://apimconfig.azconfig.io;Id=sbwT-l5-s0:jh1gVSnIW4hSLH2eLWnr;Secret=A/IM3Ohp0P9s1dO6riHjdqz7vwy19qL7aZqapd2Gq8Q=");
+            //default from project, has so working examples
+            //builder.AddAzureAppConfiguration("Endpoint=https://usernormalizationconfiguration.azconfig.io;Id=Do9P-l6-s0:FCswtGBYgfMD7TNh+fMi;Secret=Veq5LbBxfMatEwsrpdAmvQScN6Rp0YTKMe3MbqXQhXY=");
+
+            //2020-10-08 config from Sebastian.Adan
+            builder.AddAzureAppConfiguration("Endpoint=https://apimb2cconf.azconfig.io;Id=yk8O-l6-s0:2fwdKxcKM8kBaR0Wh85v;Secret=ELiblmcJWMpyPCSb52AWeJC5veAePsBKKrHerNRKQO0=");
+
+            //2020-10-09 config from August.Banks
+            //builder.AddAzureAppConfiguration("Endpoint = https://augustapimconfig.azconfig.io;Id=bCPZ-l2-s0:mg4Rkg3xqWcaJt9eky42;Secret=i/fWaETsk4BE2Kn1SipvdcpO3kgy7CepUPSBZ7eHDXk=");
+            
             Configuration = builder.Build();
             return Configuration.Get<AppSettings>();
         }
@@ -22,6 +29,14 @@ namespace APIMUserNormalization.Models
 
     public class AppSettings
     {
+
+
+
+        [JsonProperty(PropertyName = "TableConnection")]
+        public string TableConnection { get; set; }
+
+        [JsonProperty(PropertyName = "MigrationEnabled")]
+        public bool MigrationEnabled { get; set; }
 
         [JsonProperty(PropertyName = "AADB2CTenantId")]
         public string AADB2CTenantId { get; set; }

@@ -7,6 +7,7 @@ namespace APIMUserNormalization.Models
 {
     public class UserCollection
     {
+
         [JsonPropertyName("nextLink")]
         public string nextLink { get; set; }
 
