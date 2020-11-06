@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj": {}
+    "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj": {}
   },
   "projects": {
-    "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj": {
+    "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj",
+        "projectUniqueName": "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj",
         "projectName": "ApimUserConsole",
-        "projectPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj",
-        "packagesPath": "C:\\Users\\kaswiere\\.nuget\\packages\\",
-        "outputPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\ApimUserConsole\\obj\\",
+        "projectPath": "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\ApimUserConsole\\ApimUserConsole.csproj",
+        "packagesPath": "C:\\Users\\August\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\ApimUserConsole\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\kaswiere\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\August\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -30,8 +30,8 @@
         "frameworks": {
           "netcoreapp3.1": {
             "projectReferences": {
-              "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj": {
-                "projectPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj"
+              "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj": {
+                "projectPath": "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj"
               }
             }
           }
@@ -67,24 +67,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.301\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj": {
+    "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj",
+        "projectUniqueName": "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj",
         "projectName": "APIMUserNormalization",
-        "projectPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj",
-        "packagesPath": "C:\\Users\\kaswiere\\.nuget\\packages\\",
-        "outputPath": "C:\\dev\\DevPortalUserB2CIdentity\\APIMUserNormalization\\APIMUserNormalization\\obj\\",
+        "projectPath": "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\APIMUserNormalization\\APIMUserNormalization.csproj",
+        "packagesPath": "C:\\Users\\August\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\August\\Source\\Repos\\DevPortB2CIdentityWB\\APIMUserNormalization\\APIMUserNormalization\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\kaswiere\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\August\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -108,6 +108,10 @@
       "frameworks": {
         "netcoreapp3.1": {
           "dependencies": {
+            "Microsoft.Azure.Cosmos.Table": {
+              "target": "Package",
+              "version": "[2.0.0-preview, )"
+            },
             "Microsoft.CodeAnalysis.FxCopAnalyzers": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
@@ -129,6 +133,10 @@
             "Microsoft.NET.Sdk.Functions": {
               "target": "Package",
               "version": "[3.0.3, )"
+            },
+            "log4net": {
+              "target": "Package",
+              "version": "[2.0.12, )"
             }
           },
           "imports": [
@@ -146,7 +154,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.301\\RuntimeIdentifierGraph.json"
         }
       }
     }

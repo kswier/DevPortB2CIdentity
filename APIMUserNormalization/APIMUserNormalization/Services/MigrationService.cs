@@ -8,6 +8,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using log4net;
+using log4net.Config;
+using System.IO;
+using System.Reflection;
 
 namespace APIMUserNormalization.Services
 {
@@ -18,12 +24,16 @@ namespace APIMUserNormalization.Services
         APIMService[] apims;
         ArrayList userNormalizationList = new ArrayList();
 
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         static AppSettings config;
         bool userSetup = false;
 
 
         public MigrationService()
         {
+            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
             adB2CUsersAll = new List<User>();
             config = AppSettingsFile.ReadFromJsonFile();
@@ -157,6 +167,8 @@ namespace APIMUserNormalization.Services
 
         public async Task NormalizeAllUsersAsync()
         {
+            ArrayList newUNL = new ArrayList();
+
             foreach (UserNormalization un in userNormalizationList)
             {
                 Console.WriteLine("-----------------------------------");
@@ -166,6 +178,72 @@ namespace APIMUserNormalization.Services
                 Console.WriteLine("");
             }
 
+        }
+
+        public void PrintUsers()
+        {
+            int row = 1;
+            string s = string.Empty;
+            string sn = "#";
+            string sa = "User Email";
+            string sb = "[APIMs]";
+            string sc = "[Diff Object IdS]";
+            string sg = "[Exists in APIM?]";
+            string sd = "[AD B2C Enabled]";
+            string se = "[Object Id Match]";
+            string sf = "[AD B2C Email Match]";
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Evaluation per user");
+            Console.WriteLine("{6,2}.- {0,-22} {1,5} {2,5} | {7,15}{3,15}{4,15}{5,15} |", sa, sb, sc, sd, se, sf, sn, sg);
+            Console.WriteLine();
+
+            Console.WriteLine("{2,2}.- {0,-40} {2,2}, {2,2} | {1,3}{1,3}{1,3}    |", sa, s, sn);
+            foreach (UserNormalization un in userNormalizationList)
+            {
+                if (!un.IsValidated)
+                {
+                    un.validateUser();
+                }
+                if (!un.IsCrossValidated)
+                {
+                    un.crossValidateUser(apims);
+                }
+
+                if (un.IsNormilized)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                }
+
+
+                string s1 = un.Email;
+                string s2 = un.ApimsFound.ToString();
+                string s3 = un.UniqueIdS.ToString();
+                string s4 = string.Empty;
+                string s5 = string.Empty;
+                string s6 = string.Empty;
+                string s7 = string.Empty;
+                Console.Write("{6,2}.- {0,-40} {1,2}, {2,2} ", s1, s2, s3, s4, s5, s6, row);
+                foreach (UserNormalizationStatus uns in un.UsersStatus)
+                {
+                    s7 = uns.ExistsInAPIM ? "[x]" : "[_]";
+                    s4 = uns.HasADB2C ? "[x]" : "[_]";
+                    s5 = uns.IsFoundInADB2C ? "[x]" : "[_]";
+                    s6 = uns.IsEmailFoundInADB2C ? "[x]" : "[_]";
+                    Console.Write("| {7,3}{3,3}{4,3}{5,3} |", s1, s2, s3, s4, s5, s6, row, s7);
+                }
+
+                //Console.WriteLine("{6,2}.- {0,-40} {1,2}, {2,2} | {3,3}{4,3}{5,3} |", s1, s2, s3, s4, s5, s6, row);
+                Console.WriteLine("");
+                row++;
+            }
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.ResetColor();
         }
 
         private void PrintUserNormalizationStatus()
@@ -251,6 +329,7 @@ namespace APIMUserNormalization.Services
                 apimUserCollections[i] = userCollection;
                 i++;
                 int count = userCollection == null ? 0 : userCollection.count;
+
                 Console.WriteLine(" For APIM " + apim.APIMServiceName + " there are " + count + " users");
             }
 
@@ -281,8 +360,10 @@ namespace APIMUserNormalization.Services
 
             foreach (var userCollection in apimUserCollections)
             {
+                //ALB:-Addition to skip null collections
                 if (userCollection != null)
                 {
+
                     foreach (var user in userCollection.value)
                     {
 
@@ -300,7 +381,7 @@ namespace APIMUserNormalization.Services
                             {
                                 hasADB2C = true;
 
-                                var b2cUser = await GetAADB2CUserById(identity.Id);
+                                var b2cUser = await GetAADB2CUserById(identity.Id, user.Name);
                                 if (b2cUser == null)
                                 {
                                     isFoundInADB2C = false;
@@ -342,8 +423,15 @@ namespace APIMUserNormalization.Services
                             userNormalizationList.Add(un);
                         }
                     }
+
+                }
+                else
+                {
+                    Console.WriteLine("Empty APIM");
                 }
                 iterIdx++;
+
+
             }
 
             userSetup = true;
@@ -446,6 +534,7 @@ namespace APIMUserNormalization.Services
                         foreach (var identity in user.Identities)
                         {
                             output += "; Identity User: " + identity.Issuer + "; Identity SignIn Type: " + identity.SignInType + "; Identity Assigned Id:" + identity.IssuerAssignedId;
+
                             Console.WriteLine(output);
                         }
                     }
@@ -588,7 +677,8 @@ namespace APIMUserNormalization.Services
             // Set up the Microsoft Graph service client with client credentials
             GraphServiceClient graphClient = new GraphServiceClient(authProvider);
 
-            var addedUser = await UserService.CreateUserFromAPIMToAADB2C(graphClient, config.AADB2CB2cExtensionAppClientId, config.AADB2CTenantId, user);
+            var addedUser = await UserService.CreateUserFromAPIMToAADB2C(graphClient, config.AADB2CB2cExtensionAppClientId, config.AADB2CTenantId, user, config.MigrationEnabled, config.TableConnection);
+
             return addedUser;
         }
 
@@ -610,10 +700,35 @@ namespace APIMUserNormalization.Services
             return await UserService.GetAADB2CUsers(graphClient);
         }
 
+
+        public async Task Create100APIMUsers(UserNormalization un)
+        {
+            UserContract userContractbase = GetUserContractFor(un.Email);
+            string firstName = userContractbase.Properties.FirstName;
+            string email = userContractbase.Properties.Email;
+
+            UserContract userContract = userContractbase;
+            for (int iter100 = 0; iter100 < 100; iter100++)
+            {
+                userContract.Properties.FirstName = firstName + iter100;
+                userContract.Properties.Email = email.Replace("@", iter100 + "@");
+                userContract.Properties.Identities[0].Id = userContract.Properties.Email;
+
+                foreach (UserNormalizationStatus uns in un.UsersStatus)
+                {
+                    Console.WriteLine("        Creating user in service: " + uns.APIMName);
+                    APIMService apimClient = apims[0];
+                    string response = await apimClient.CreateUserInApim(userContract);
+                    Console.WriteLine("        Result: " + response.Substring(0, 30) + (response.Length > 30 ? "..." : ""));
+                    Console.WriteLine("");
+                }
+            }
+        }
         public async Task NormalizeUserAsync(UserNormalization un)
         {
             if (un.IsNormilized)
             {
+                log.Info("User already normalized");
                 return;
             }
 
@@ -633,15 +748,16 @@ namespace APIMUserNormalization.Services
 
                     if (!uns.ExistsInAPIM)
                     {
-                        Console.WriteLine("        Creating user in service: " + uns.APIMName);
+                        log.Info("        Creating user in service: " + uns.APIMName);
                         APIMService apimClient = apims[iter1];
                         string response = await apimClient.CreateUserInApim(userContract);
-                        Console.WriteLine("        Result: " + response.Substring(0, 30) + (response.Length > 30 ? "..." : ""));
+                        log.Info("        Result: " + response.Substring(0, 30) + (response.Length > 30 ? "..." : ""));
                         Console.WriteLine("");
                         userCreated = true;
                     }
                     iter1++;
                 }
+
                 if (userCreated)
                 {
                     await RePopulateAPIMUserCollection();
@@ -650,13 +766,16 @@ namespace APIMUserNormalization.Services
             }
             else
             {
-                Console.WriteLine("      User " + userContract.Properties.Email + " not suitable for normalization");
+                Console.WriteLine("      User " + userContract.Properties.Email + " not suitable for APIM addition as is an Azure user type");
             }
 
             Console.WriteLine("  2) Create user in ADB2C if needed");
             int iter2 = 0;
             string objectId = string.Empty;
 
+            //ALB - next 2 lines to copy the source APIM to the userContract object
+            UserNormalizationStatus apimFromUNS = (UserNormalizationStatus)un.UsersStatus[0];
+            userContract.sourceAPIM = apimFromUNS.APIMName;
 
             var b2CUser = GetUserInAzureB2CWithEmail(adB2CUsersAll, un.Email);
 
@@ -695,7 +814,11 @@ namespace APIMUserNormalization.Services
                     }
                     else
                     {
-                        Console.WriteLine("        ERROR While creating the user in B2C");
+                        if (config.MigrationEnabled)
+                        {
+                            Console.WriteLine("        ERROR While creating the user in B2C");
+                        }
+                        else { Console.WriteLine("        Skipped updating APIM identities as Migration is not enabled."); }
                     }
                 }
                 else
@@ -759,7 +882,7 @@ namespace APIMUserNormalization.Services
         }
 
 
-        private static Task<User> GetAADB2CUserById(string id)
+        private static Task<User> GetAADB2CUserById(string id, string userName)
         {
             // Initialize the client credential auth provider
             IConfidentialClientApplication confidentialClientApplication = ConfidentialClientApplicationBuilder
@@ -772,7 +895,7 @@ namespace APIMUserNormalization.Services
             // Set up the Microsoft Graph service client with client credentials
             GraphServiceClient graphClient = new GraphServiceClient(authProvider);
 
-            return UserService.GetUserById(graphClient, id);
+            return UserService.GetUserById(graphClient, id, userName);
         }
 
 

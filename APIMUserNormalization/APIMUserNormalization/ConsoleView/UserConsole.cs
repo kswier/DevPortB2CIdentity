@@ -6,23 +6,37 @@ using System.Threading;
 using System.Threading.Tasks;
 using APIMUserNormalization.Models;
 using System.Collections;
+using log4net;
+using log4net.Config;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace APIMUserNormalization.ConsoleView
 {
     public class UserConsole
-    {
+    { 
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         MigrationService migrationService;
+        static AppSettings config;
         bool userSetup = false;
 
         public UserConsole()
         {
             migrationService = new MigrationService();
+
+            // Load configuration
+            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
         }
-
-
         public async Task<bool> PrintMainMenu()
         {
+
+            //var ats = new AzureTableService("DefaultEndpointsProtocol=https;AccountName=apimattstorage;AccountKey=MYRxQk2IUffGfQjHm3f2yyPePmb/CyJYU4VgZTtxUqpP1/IICaIeCatGwqC0dSm0UeodqRhqjKda7GFGiht9LA==;EndpointSuffix=core.windows.net", "accountsLog");
+            //ats.WriteSuccessEnablement("podmtyapimb2c", "october19@iqextreme.com", "props", "DevCenter2020!", true);
+
+
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
             Console.WriteLine();
@@ -102,21 +116,23 @@ namespace APIMUserNormalization.ConsoleView
             Console.WriteLine("Choose your user #");
             string idx = Console.ReadLine().ToUpper();
             int userIdx = int.Parse(idx);
-            ArrayList userNormalizationList = migrationService.getUserNormalizationList();
-            var un = (UserNormalization) userNormalizationList[userIdx - 1];
-            Console.WriteLine("User Email: " + un.Email);
 
-            Console.Write("    Is user normilized?: ");
+
+            ArrayList userNormalizationList = migrationService.getUserNormalizationList();
+            var un = (UserNormalization)userNormalizationList[userIdx - 1];
+            log.Info("User Email: " + un.Email);
+
+            Console.Write("    Is user normalized?: ");
             if (!un.IsNormilized)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
             }
-            Console.WriteLine(un.IsNormilized);
+            log.Info(un.IsNormilized);
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("    Found in " + un.ApimsFound + " APIM Services");
-            Console.WriteLine("    User with " + un.UniqueIdS + " unique Object IdS");
-            Console.WriteLine();
-            Console.WriteLine("Normalization Plan:");
+            log.Info("    Found in " + un.ApimsFound + " APIM Services");
+            log.Info("    User with " + un.UniqueIdS + " unique Object IdS");
+            log.Info("");
+            log.Info("Normalization Plan:");
 
             string s4 = string.Empty;
             string s5 = string.Empty;
@@ -136,11 +152,16 @@ namespace APIMUserNormalization.ConsoleView
             string yn = Console.ReadLine().ToUpper();
             if (yn.ToUpper().Equals("Y"))
             {
+                log.Info("Normalize User selected!");
+
+                //ALB: dummy function to create fake users 
+                //await migrationService.Create100APIMUsers(un);
+
                 await migrationService.NormalizeUserAsync(un);
             }
 
         }
-        
+
         private async Task BackupRestoreAPIM()
         {
             Console.WriteLine("[1]      Backup APIM");
