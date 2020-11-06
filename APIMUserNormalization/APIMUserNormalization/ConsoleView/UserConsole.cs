@@ -15,7 +15,7 @@ using System.Reflection;
 namespace APIMUserNormalization.ConsoleView
 {
     public class UserConsole
-    {
+    { 
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         MigrationService migrationService;
