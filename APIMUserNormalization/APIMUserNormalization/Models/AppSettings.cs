@@ -13,8 +13,9 @@ namespace APIMUserNormalization.Models
         public static AppSettings ReadFromJsonFile()
         {
             var builder = new ConfigurationBuilder();
-            //builder.AddAzureAppConfiguration("Endpoint=https://apimb2cconf.azconfig.io;Id=yk8O-l6-s0:2fwdKxcKM8kBaR0Wh85v;Secret=ELiblmcJWMpyPCSb52AWeJC5veAePsBKKrHerNRKQO0=");
-            builder.AddAzureAppConfiguration("Endpoint = https://apimconfig.azconfig.io;Id=sbwT-l5-s0:jh1gVSnIW4hSLH2eLWnr;Secret=A/IM3Ohp0P9s1dO6riHjdqz7vwy19qL7aZqapd2Gq8Q=");
+            builder.AddJsonFile("appSettings.json");
+            Configuration = builder.Build();
+            builder.AddAzureAppConfiguration(Configuration["appconfigendpoint"]);
             Configuration = builder.Build();
             return Configuration.Get<AppSettings>();
         }
