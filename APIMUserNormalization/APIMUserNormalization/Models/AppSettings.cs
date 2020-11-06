@@ -23,6 +23,11 @@ namespace APIMUserNormalization.Models
 
     public class AppSettings
     {
+        [JsonProperty(PropertyName = "TableConnection")]
+        public string TableConnection { get; set; }
+
+        [JsonProperty(PropertyName = "MigrationEnabled")]
+        public bool MigrationEnabled { get; set; }
 
         [JsonProperty(PropertyName = "AADB2CTenantId")]
         public string AADB2CTenantId { get; set; }
