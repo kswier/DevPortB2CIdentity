@@ -134,6 +134,7 @@ namespace APIMUserNormalization.Services
                 if (ex.Message.Contains("NotFound") || ex.Message.Contains("Not Found"))
                 {
                     Console.WriteLine("User Name: (" + userName + ") User Id: (" + userId + ") Not Found in Azure AD B2C");
+                    Console.WriteLine("Exception="  + ex.Message);
                 }
                 else
                 {

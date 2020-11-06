@@ -891,11 +891,18 @@ namespace APIMUserNormalization.Services
                 .WithClientSecret(config.AADB2CClientSecret)
                 .Build();
             ClientCredentialProvider authProvider = new ClientCredentialProvider(confidentialClientApplication);
-
+            
+            log.Info("Looking for user id " + id + "and user name" + userName);
             // Set up the Microsoft Graph service client with client credentials
             GraphServiceClient graphClient = new GraphServiceClient(authProvider);
 
-            return UserService.GetUserById(graphClient, id, userName);
+            var user = UserService.GetUserById(graphClient, id, userName);
+            if (user == null)
+            {
+                log.Info("Looking for user id "+ id + " ; user name "+ userName + " returned null was not found b2cAppId="+ config.AADB2CAppId + "tenantID=" + config.AADB2CTenantId);
+            }
+
+            return user;
         }
 
 
