@@ -321,6 +321,7 @@ namespace APIMUserNormalization.Services
 
         public static async Task<User> CreateUserFromAPIMToAADB2C(GraphServiceClient graphClient, string b2cExtensionAppClientId, string tenantId, UserContract user, bool migrationEnabled, string tableConnection)
         {
+            string userId = "";
             string defaultPassword = "DevCenter2020!";
             if (string.IsNullOrWhiteSpace(b2cExtensionAppClientId))
             {
@@ -371,9 +372,9 @@ namespace APIMUserNormalization.Services
                         },
                         PasswordPolicies = "DisablePasswordExpiration" //,
                         //AdditionalData = extensionInstance
-                    });
+                    }); ;
 
-                    string userId = result.Id;
+                    userId = result.Id;
 
                     // Get created user by object ID
                     result = await graphClient.Users[userId]
@@ -395,15 +396,13 @@ namespace APIMUserNormalization.Services
 
                 //ALB:  If we skipped the results because this is a test then add to log
                 //      If we got the results then add to log
-                if (result != null || !migrationEnabled)
+                if ((result != null) || (!migrationEnabled))
                 {
                     string jsonProps = JsonConvert.SerializeObject(user.Properties, Formatting.Indented);
 
                     var ats = new AzureTableService(tableConnection, "accountsLog");
-                    ats.WriteSuccessEnablement(user.sourceAPIM, user.Properties.Email, jsonProps, defaultPassword, migrationEnabled);
-                    //ALB:Done
+                    ats.WriteSuccessEnablement(user.sourceAPIM, user.Properties.Email, userId, jsonProps, defaultPassword, migrationEnabled);
                 }
-
                 return result;
             }
             catch (ServiceException ex)

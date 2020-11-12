@@ -16,7 +16,7 @@ namespace APIMUserNormalization.Services
             storageTable = table;
         }
 
-        public void WriteSuccessEnablement(string apim, string email, string props, string pwd, bool enabled)
+        public void WriteSuccessEnablement(string apim, string email, string userId, string props, string pwd, bool enabled)
         {
             try
             {
@@ -24,14 +24,16 @@ namespace APIMUserNormalization.Services
                 CloudTableClient tblclient = storageAcc.CreateCloudTableClient(new TableClientConfiguration());
                 CloudTable table = tblclient.GetTableReference(storageTable);
 
-                APIMUser au = new APIMUser(apim, email, props, pwd, enabled);
+                APIMUser au = new APIMUser(apim, email, userId, props, pwd, enabled);
 
                 TableOperation insertOperation = TableOperation.InsertOrMerge(au);
                 var results = table.Execute(insertOperation);
+
+                Console.WriteLine("Finished writing to the accountLog" + props);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("Exception in write accountLog " + ex.Message);
             }
             return;
         }
@@ -43,11 +45,13 @@ namespace APIMUserNormalization.Services
         public string Properties { get; set; }
         public string Password { get; set; }
         public bool EnabledB2C { get; set; }
+        public string UserId { get; set; }
 
-        public APIMUser(string apim, string email, string props, string pwd, bool inB2C)
+        public APIMUser(string apim, string email, string userId, string props, string pwd, bool inB2C)
         {
             PartitionKey = apim;
             RowKey = email;
+            UserId = userId;
             EnabledB2C = inB2C;
             Properties = props;
             Password = pwd;
