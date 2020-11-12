@@ -90,22 +90,19 @@ namespace APIMUserNormalization.Services
         public async Task<UserCollection> GetUsersFromAPIM()
         {
             //ALB: The NextLink metaphor is to get all users by page. Using this technique since the quantity known for this project is less than 300.
-            string oldNextLink = "";
+            string nextLink = "";
             UserCollection users = await GetApiManagementUsersAsync(APIMSubscriptionId, APIMResourceGroup, APIMServiceName);
-            while (users.nextLink != null)
-            {
-                if (oldNextLink == users.nextLink)
-                {
-                    break;
-                }
-                // since the request is limited to 100 users, this will get the next list of users and add them.
-                UserCollection nextUsers = await GetApiManagementUsersAsync(APIMSubscriptionId, APIMResourceGroup, APIMServiceName, users.nextLink);
-                foreach (var user in nextUsers.value)
-                {
-                    users.AddUserContract(user);
-                }
+            int totalUsers = users.count;
+            int incrementor = 100;
 
-                oldNextLink = users.nextLink;
+            //users.count is the expected number of users, while users.value.length is the actual number of users
+            while (users.value.Length < totalUsers)
+            {
+                // since the request is limited to 100 users, this will get the next list of users and add them.
+                UserCollection nextUsers = await GetApiManagementUsersAsync(APIMSubscriptionId, APIMResourceGroup, APIMServiceName, incrementor);
+                users.AddUserCollection(nextUsers);
+
+                incrementor += 100;
             }
 
             return users;
@@ -134,7 +131,7 @@ namespace APIMUserNormalization.Services
             apiManagementName = "/providers/Microsoft.ApiManagement/service/" + apiManagementName;
 
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(url + subscriptionId + resourceGroup + apiManagementName + request + urlParameters);
+            client.BaseAddress = new Uri(url + subscriptionId + resourceGroup + apiManagementName + request);
 
             // Add an Accept header for JSON format.
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -246,16 +243,16 @@ namespace APIMUserNormalization.Services
         }
 
 
-        private async Task<UserCollection> GetApiManagementUsersAsync(string subscriptionId, string resourceGroup, string apiManagementName, string nextLink = "")
+        private async Task<UserCollection> GetApiManagementUsersAsync(string subscriptionId, string resourceGroup, string apiManagementName, int startAt = 0)
         {
             var responseValue = "";
-            var urlEnd = "";
-            if (nextLink != "")
+            var urlParameters = "?api-version=2019-01-01";
+            if (startAt != 0)
             {
-                urlEnd = nextLink.Substring(nextLink.IndexOf("2019-01-01") + 10);
+                urlParameters += "&$skip=" + startAt;
             }
 
-            responseValue = await ExecuteGetRequest("https://management.azure.com/subscriptions/", subscriptionId, resourceGroup, apiManagementName, "/users", "?api-version=2019-01-01" + urlEnd);
+            responseValue = await ExecuteGetRequest("https://management.azure.com/subscriptions/", subscriptionId, resourceGroup, apiManagementName, "/users", urlParameters);
             if (responseValue != null && !responseValue.Equals(string.Empty))
             {
                 UserCollection users = System.Text.Json.JsonSerializer.Deserialize<UserCollection>(responseValue);

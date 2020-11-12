@@ -17,6 +17,16 @@ namespace APIMUserNormalization.Models
         [JsonPropertyName("count")]
         public int count { get; set; }
 
+        public void AddUserCollection(UserCollection users)
+        {
+            var list = new List<UserContract>();
+            list.AddRange(value);
+            list.AddRange(users.value);
+            UserContract[] newValue = list.ToArray();
+            
+            value = newValue;
+        }
+
         public void AddUserContract(UserContract user)
         {
 

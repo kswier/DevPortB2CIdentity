@@ -9,6 +9,7 @@ namespace APIMUserNormalization.Services
     {
         string storageConn = "";
         string storageTable = "";
+
         public AzureTableService(string storage, string table)
         {
             storageConn = storage;
@@ -17,15 +18,21 @@ namespace APIMUserNormalization.Services
 
         public void WriteSuccessEnablement(string apim, string email, string props, string pwd, bool enabled)
         {
-            CloudStorageAccount storageAcc = CloudStorageAccount.Parse(storageConn);
-            CloudTableClient tblclient = storageAcc.CreateCloudTableClient(new TableClientConfiguration());
-            CloudTable table = tblclient.GetTableReference(storageTable);
+            try
+            {
+                CloudStorageAccount storageAcc = CloudStorageAccount.Parse(storageConn);
+                CloudTableClient tblclient = storageAcc.CreateCloudTableClient(new TableClientConfiguration());
+                CloudTable table = tblclient.GetTableReference(storageTable);
 
-            APIMUser au = new APIMUser(apim, email, props, pwd, enabled);
+                APIMUser au = new APIMUser(apim, email, props, pwd, enabled);
 
-            TableOperation insertOperation = TableOperation.InsertOrMerge(au);
-            var results = table.Execute(insertOperation);
-
+                TableOperation insertOperation = TableOperation.InsertOrMerge(au);
+                var results = table.Execute(insertOperation);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             return;
         }
     }
