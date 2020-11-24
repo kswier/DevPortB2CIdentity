@@ -322,7 +322,9 @@ namespace APIMUserNormalization.Services
         public static async Task<User> CreateUserFromAPIMToAADB2C(GraphServiceClient graphClient, string b2cExtensionAppClientId, string tenantId, UserContract user, bool migrationEnabled, string tableConnection)
         {
             string userId = "";
-            string defaultPassword = "DevCenter2020!";
+            
+            //string defaultPassword = "DevCenter2020!";
+            string defaultPassword = Helpers.PasswordHelper.GenerateNewPassword(5, 5, 5);
             if (string.IsNullOrWhiteSpace(b2cExtensionAppClientId))
             {
                 throw new ArgumentException("B2C Extension App ClientId (ApplicationId) is missing in the appsettings.json. Get it from the App Registrations blade in the Azure portal. The app registration has the name 'b2c-extensions-app. Do not modify. Used by AADB2C for storing user data.'.", nameof(b2cExtensionAppClientId));
